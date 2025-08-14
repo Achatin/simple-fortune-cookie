@@ -44,6 +44,4 @@ jobs:
     - name: Pull frontend image
       run: docker pull ${{ env.IMAGE_FRONTEND }}
     - name: Run frontend tests
-      run: |
-        docker build --target builder -t frontend-test ./frontend
-        docker run --rm frontend-test go test ./...
+      run: go test
