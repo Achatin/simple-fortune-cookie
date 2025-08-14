@@ -21,6 +21,13 @@ jobs:
       
     - name: Build frontend
       run: cd frontend && go build
+
+    - name: Upload repository
+      uses: actions/upload-artifact@v4
+      with:
+        name: code
+        path: .
+        include-hidden-files: true
       
   Test:
     runs-on: ubuntu-latest
