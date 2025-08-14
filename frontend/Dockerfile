@@ -5,7 +5,7 @@ COPY . .
 RUN go build -o server .
 
 # Runtime stage
-FROM golang:alpine
+FROM alpine:latest
 WORKDIR /app
 COPY --from=builder /app/server .
 COPY ./static ./static
