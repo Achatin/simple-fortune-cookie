@@ -7,8 +7,8 @@ on:
 env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-  IMAGE_BACKEND: achatin/simple-fortune-cookie-backend:latest
-  IMAGE_FRONTEND: achatin/simple-fortune-cookie-frontend:latest
+  IMAGE_BACKEND: ${{ secrets.DOCKERHUB_USERNAME }}/simple-fortune-cookie-backend:latest
+  IMAGE_FRONTEND: ${{ secrets.DOCKERHUB_USERNAME }}/simple-fortune-cookie-frontend:latest
 
 jobs:
   Build:
@@ -20,12 +20,6 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.20'
-
-    # - name: Build backend
-    #   run: cd backend && go build
-      
-    # - name: Build frontend
-    #   run: cd frontend && go build
 
     - name: Log in to DockerHub
       uses: docker/login-action@v2
@@ -47,10 +41,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [Build]
     steps:
-    - name: Pull backend image
-      run: docker pull ${{ env.IMAGE_BACKEND }}
     - name: Pull frontend image
       run: docker pull ${{ env.IMAGE_FRONTEND }}
     - name: Run frontend tests
       run: |
-        docker run --rm ${{ env.IMAGE_FRONTEND }} go test ./...
+        docker build --target builder -t frontend-test ./frontend
+        docker run --rm frontend-test go test ./...
