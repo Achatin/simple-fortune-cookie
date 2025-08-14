@@ -1,0 +1,29 @@
+name: Main workflow
+
+on:
+  push:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+
+    - name: Build backend
+      run: go build backend
+      
+    - name: Build frontend
+      run: go build frontend
+  Test:
+    runs-on: ubuntu-latest
+    needs: [Build]
+    steps:
+    - name: Test
+      run: go test frontend
