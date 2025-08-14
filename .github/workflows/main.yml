@@ -21,9 +21,15 @@ jobs:
       
     - name: Build frontend
       run: cd frontend && go build
+      
   Test:
     runs-on: ubuntu-latest
     needs: [Build]
     steps:
+    - name: Download code
+      uses: actions/download-artifact@v4
+      with:
+        name: code
+        path: .
     - name: Test
       run: cd frontend && go test
