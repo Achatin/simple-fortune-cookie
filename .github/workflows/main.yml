@@ -62,3 +62,6 @@ jobs:
       - name: Deploy to Kubernetes
         run: |
           kubectl --kubeconfig=kubeconfig apply -f kubernetes/
+
+      - name: Add deployment link to workflow summary
+        run: echo "[🌐 Open App](http://13.62.20.151:32080/)" >> $GITHUB_STEP_SUMMARY
