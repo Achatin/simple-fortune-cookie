@@ -26,4 +26,4 @@ jobs:
     needs: [Build]
     steps:
     - name: Test
-      run: go test frontend
+      run: cd frontend && go test
