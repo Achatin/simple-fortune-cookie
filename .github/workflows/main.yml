@@ -4,6 +4,12 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  IMAGE_BACKEND: achatin/simple-fortune-cookie-backend:latest
+  IMAGE_FRONTEND: achatin/simple-fortune-cookie-frontend:latest
+
 jobs:
   Build:
     runs-on: ubuntu-latest
@@ -15,27 +21,36 @@ jobs:
       with:
         go-version: '1.20'
 
-    - name: Build backend
-      run: cd backend && go build
+    # - name: Build backend
+    #   run: cd backend && go build
       
-    - name: Build frontend
-      run: cd frontend && go build
+    # - name: Build frontend
+    #   run: cd frontend && go build
 
-    - name: Upload repository
-      uses: actions/upload-artifact@v4
+    - name: Log in to DockerHub
+      uses: docker/login-action@v2
       with:
-        name: code
-        path: .
-        include-hidden-files: true
+        username: ${{ env.DOCKERHUB_USERNAME }}
+        password: ${{ env.DOCKERHUB_TOKEN }}
+
+    - name: Build backend image
+      run: |
+        docker build -t $IMAGE_BACKEND ./backend
+        docker push $IMAGE_BACKEND
+
+    - name: Build frontend image
+      run: |
+        docker build -t $IMAGE_FRONTEND ./frontend
+        docker push $IMAGE_FRONTEND
       
   Test:
     runs-on: ubuntu-latest
     needs: [Build]
     steps:
-    - name: Download code
-      uses: actions/download-artifact@v4
-      with:
-        name: code
-        path: .
-    - name: Test
-      run: cd frontend && go test
+    - name: Pull backend image
+      run: docker pull ${{ env.IMAGE_BACKEND }}
+    - name: Pull frontend image
+      run: docker pull ${{ env.IMAGE_FRONTEND }}
+    - name: Run frontend tests
+      run: |
+        docker run --rm ${{ env.IMAGE_FRONTEND }} go test ./...
