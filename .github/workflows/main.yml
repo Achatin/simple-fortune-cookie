@@ -41,7 +41,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [Build]
     steps:
-    - name: Pull frontend image
-      run: docker pull ${{ env.IMAGE_FRONTEND }}
+    - uses: actions/checkout@v4
+
+    - name: Build frontend builder image
+      run: docker build --target builder -t frontend-builder ./frontend
+
     - name: Run frontend tests
-      run: go test
+      run: docker run --rm frontend-builder go test ./...
+
