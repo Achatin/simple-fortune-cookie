@@ -75,7 +75,7 @@ jobs:
         run: |
           chmod +x ./scripts/deployment-test.sh
           # Start port-forward in background
-          kubectl --kubeconfig=kubeconfig port-forward svc/test-frontend-service 8080:80 > port-forward.log 2>&1 &
+          kubectl --kubeconfig=kubeconfig port-forward svc/test-frontend-service 8080:8000 > port-forward.log 2>&1 &
           PF_PID=$!
           
           # Give it a few seconds to establish
@@ -89,6 +89,13 @@ jobs:
           
           echo ""
           echo "📊 Test completed - check results above
+    
+      - name: Cleanup test deployment
+        if: always()  # Always cleanup, even if tests fail
+        run: |
+          echo "🧹 Cleaning up test deployment..."
+          kubectl --kubeconfig=kubeconfig delete -f ./kubernetes/deployment-test/ --ignore-not-found=true
+          echo "✅ Cleanup completed" 
 
   Deploy:
     runs-on: ubuntu-latest
