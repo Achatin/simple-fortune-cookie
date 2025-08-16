@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-frontend-deployment
+spec:
+  selector:
+    matchLabels:
+      app: test-frontend-deployment
+  template:
+    metadata:
+      labels:
+        app: test-frontend-deployment
+    spec:
+      containers:
+      - name: test-frontend-deployment
+        image: achatin/simple-fortune-cookie-frontend:latest
+        ports:
+          - containerPort: 8080
+        env:
+          - name: BACKEND_DNS
+            value: test-backend-service
+          - name: BACKEND_PORT
+            value: "9000"
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
