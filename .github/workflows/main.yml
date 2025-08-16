@@ -82,7 +82,7 @@ jobs:
           sleep 5
           
           echo "🧪 Running basic tests against localhost..."
-          ./test-app.sh http://localhost:8080
+          ./scripts/deployment-test.sh http://localhost:8080
           
           # Kill port-forward process
           kill $PF_PID
