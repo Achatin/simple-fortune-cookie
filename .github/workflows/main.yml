@@ -51,10 +51,49 @@ jobs:
     - name: Run frontend tests
       run: docker run --rm frontend-builder go test ./...
 
+  DeploymentTest:
+    runs-on: ubuntu-latest
+    needs: [Build]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Restore kubeconfig
+        run: echo "${{ secrets.KUBECONFIG }}" | base64 --decode > kubeconfig
+
+      - name: Deploy test version
+        run: |
+          kubectl --kubeconfig=kubeconfig apply -f kubernetes/deployment-test
+          
+          # Wait for deployment to be ready (with timeout)
+          echo "Waiting for test deployment to be ready..."
+          kubectl --kubeconfig=kubeconfig wait --for=condition=available --timeout=300s deployment/test-frontend-deployment
+          
+          echo "Test deployment ready!"
+      
+      - name: Run test script
+        run: |
+          chmod +x ./scripts/deployment-test.sh
+          # Start port-forward in background
+          kubectl --kubeconfig=kubeconfig port-forward svc/test-frontend-service 8080:80 > port-forward.log 2>&1 &
+          PF_PID=$!
+          
+          # Give it a few seconds to establish
+          sleep 5
+          
+          echo "🧪 Running basic tests against localhost..."
+          ./test-app.sh http://localhost:8080
+          
+          # Kill port-forward process
+          kill $PF_PID
+          
+          echo ""
+          echo "📊 Test completed - check results above
+
   Deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [Test]
+    needs: [Test, DeploymentTest]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -68,18 +107,4 @@ jobs:
 
       - name: Add deployment link to workflow summary
         run: echo "[🌐 Open App](http://13.62.20.151:32080/)" >> $GITHUB_STEP_SUMMARY
-
-  SmokeTest:
-    runs-on: ubuntu-latest
-    needs: [Deploy]
-    steps:
-      - name: Run health check against deployed app
-        run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://13.62.20.151:32080/healthz)
-          if [ "$STATUS" -eq 200 ]; then
-            echo "✅ Deployed app is healthy"
-          else
-            echo "❌ Health check failed (status $STATUS)"
-            exit 1
-          fi
 

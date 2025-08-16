@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-redis
+spec:
+  selector:
+    matchLabels:
+      app: test-redis
+  template:
+    metadata:
+      labels:
+        app: test-redis
+    spec:
+      containers:
+      - name: test-redis
+        image: redis:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+          - name: test-redis-storage
+            mountPath: /var/lib/redis/data
+        args: ["redis-server", "--appendonly", "yes"] # enables AOF persistance
+      volumes:
+        - name: test-redis-storage
+          persistentVolumeClaim:
+            claimName: test-redis-pvc

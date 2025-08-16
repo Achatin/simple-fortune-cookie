@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-backend-deployment
+spec:
+  selector:
+    matchLabels:
+      app: test-backend-deployment
+  template:
+    metadata:
+      labels:
+        app: test-backend-deployment
+    spec:
+      containers:
+      - name: test-backend-deployment
+        image: achatin/simple-fortune-cookie-backend:latest
+        ports:
+         - containerPort: 9000
+        env:
+          - name: REDIS_DNS
+            value: redis
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
