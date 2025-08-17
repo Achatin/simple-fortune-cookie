@@ -27,7 +27,8 @@ jobs:
       - name: Install golangci-lint
         uses: golangci/golangci-lint-action@v4
         with:
-          version: v1.56 # pick a stable version
+          version: v1.56
+          working-directory: ./backend
 
       - name: Run linter on backend
         run: golangci-lint run --fix ./backend/...
