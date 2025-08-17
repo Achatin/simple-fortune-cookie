@@ -126,7 +126,7 @@ jobs:
   Deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [Test, DeploymentTest]
+    needs: [Test, DeploymentTest, SecurityScan]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
