@@ -28,6 +28,7 @@ jobs:
         with:
           version: v1.56
           working-directory: ./frontend
+          args: --fix ./...
           
   LintBackend:
     runs-on: ubuntu-latest
@@ -44,6 +45,7 @@ jobs:
         with:
           version: v1.56
           working-directory: ./backend
+          args: --fix ./...
 
   Build:
     runs-on: ubuntu-latest
