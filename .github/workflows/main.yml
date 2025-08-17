@@ -13,9 +13,24 @@ env:
   IMAGE_FRONTEND: ${{ secrets.DOCKERHUB_USERNAME }}/simple-fortune-cookie-frontend:latest
 
 jobs:
-  Lint:
+  LintFrontend:
     runs-on: ubuntu-latest
-    needs: [Build]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: v1.56
+          working-directory: ./frontend
+          
+  LintBackend:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -29,12 +44,6 @@ jobs:
         with:
           version: v1.56
           working-directory: ./backend
-
-      - name: Run linter on backend
-        run: golangci-lint run --fix ./backend/...
-
-      - name: Run linter on frontend
-        run: golangci-lint run --fix ./frontend/..
 
   Build:
     runs-on: ubuntu-latest
