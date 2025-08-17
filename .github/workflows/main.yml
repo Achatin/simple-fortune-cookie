@@ -30,10 +30,10 @@ jobs:
           version: v1.56 # pick a stable version
 
       - name: Run linter on backend
-        run: golangci-lint run ./backend/...
+        run: golangci-lint run --fix ./backend/...
 
       - name: Run linter on frontend
-        run: golangci-lint run ./frontend/..
+        run: golangci-lint run --fix ./frontend/..
 
   Build:
     runs-on: ubuntu-latest
